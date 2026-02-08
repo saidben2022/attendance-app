@@ -1,0 +1,35 @@
+databases:
+  - name: attendease-db
+    databaseName: attendease
+    user: attendease
+    plan: free
+    region: frankfurt
+
+services:
+  - type: web
+    name: attendease-app
+    env: php
+    plan: free
+    region: frankfurt
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "heroku-php-apache2 public/"
+    envVars:
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_DEBUG
+        value: true
+      - key: APP_URL
+        fromService:
+          type: web
+          name: attendease-app
+          property: url
+      - key: DATABASE_URL
+        fromDatabase:
+          name: attendease-db
+          property: connectionString
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: SESSION_DRIVER
+        value: cookie
+      - key: CACHE_DRIVER
+        value: file
